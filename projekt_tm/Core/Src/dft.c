@@ -37,3 +37,24 @@ void DFT(Complex *input, Complex *output, int N) {
 		output[k].imag = sum.imag;
 	}
 }
+
+void DFT_bars(Complex *input, uint8_t* display, uint8_t N) {
+
+	double temp[N];
+	double max_val = DBL_MIN;
+
+	for(int i = 0; i < N; i++) {
+		temp[i] = sqrt(pow(input[i].real,2) + pow(input[i].imag,2));
+
+		if(temp[i] > max_val) {
+			max_val = temp[i];
+
+		}
+	}
+
+	for(int i = 0; i < N; i++) {
+		temp[i] = (temp[i] / max_val) * 8;
+		display[i] = pow(2,(int)round(temp[i])) - 1;
+	}
+
+}

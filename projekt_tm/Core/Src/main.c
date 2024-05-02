@@ -23,7 +23,9 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "dft.h"
+#include "MAX7219.h"
 
 /* USER CODE END Includes */
 
@@ -34,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SIZE 8
 
 /* USER CODE END PD */
 
@@ -78,19 +81,20 @@ uint8_t size;
 
 uint8_t DataReadyFlag = 0;
 
-Complex input[4];
-Complex output[4];
+Complex input[8];
+Complex output[8];
+uint8_t dft_bars[8];
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if(receivedByte == '\n' || receivedByte == '\r'){
 		DataReceived = 1;
 		Rx_i = 0;
-		HAL_UART_Receive_IT(huart, &receivedByte, 1);
+		HAL_UART_Receive_IT(huart, (uint8_t*)&receivedByte, 1);
 		return;
 	}
 	RxData[Rx_i++] = receivedByte;
 
-	HAL_UART_Receive_IT(huart, &receivedByte, 1);
+	HAL_UART_Receive_IT(huart, (uint8_t*)&receivedByte, 1);
 
 }
 
@@ -134,6 +138,9 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2, (uint8_t*)&receivedByte, 1);
+  max7219_init();
+  max7219_turnOn();
+
 
   /* USER CODE END 2 */
 
@@ -148,18 +155,32 @@ int main(void)
 		char* token;
 		token = strtok(RxData,",");
 
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < SIZE; i++) {
 			input[i].real = atof(token);
 			token = strtok(NULL,",");
 			input[i].imag = atof(token);
 			token = strtok(NULL,",");
 		}
 
-		DFT(input, output, 4);
+		DFT(input, output, SIZE);
+		DFT_bars(output, dft_bars, SIZE);
 
-		size = sprintf(TxData,"%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n", output[0].real, output[0].imag, output[1].real, output[1].imag, output[2].real, output[2].imag, output[3].real, output[3].imag);
+		for(int i = 0; i < SIZE; i++){
+			max7219_setRow((SIZE-i), dft_bars[i]);
+		}
 
-		HAL_UART_Transmit_IT(&huart2, TxData, size);
+		size = sprintf(TxData,"%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
+				output[0].real, output[0].imag,
+				output[1].real, output[1].imag,
+				output[2].real, output[2].imag,
+				output[3].real, output[3].imag,
+				output[4].real, output[4].imag,
+				output[5].real, output[5].imag,
+				output[6].real, output[6].imag,
+				output[7].real, output[7].imag
+				);
+
+		HAL_UART_Transmit_IT(&huart2, (uint8_t*)TxData, size);
 
 
 	}

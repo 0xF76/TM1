@@ -1,1 +1,2 @@
 ../Core/Src/dft.c:8:6:DFT	96	dynamic
+../Core/Src/dft.c:41:6:DFT_bars	72	dynamic

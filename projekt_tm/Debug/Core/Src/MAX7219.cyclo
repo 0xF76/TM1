@@ -1,0 +1,8 @@
+../Core/Src/MAX7219.c:5:6:max7219_init	1
+../Core/Src/MAX7219.c:14:6:max7219_setIntensity	1
+../Core/Src/MAX7219.c:18:6:max7219_turnOn	1
+../Core/Src/MAX7219.c:21:6:max7219_turnOff	1
+../Core/Src/MAX7219.c:25:6:max7219_setLED	1
+../Core/Src/MAX7219.c:28:6:max7219_setRow	1
+../Core/Src/MAX7219.c:32:6:max7219_clearDisplay	2
+../Core/Src/MAX7219.c:38:6:max7219_SPIWrite	1
